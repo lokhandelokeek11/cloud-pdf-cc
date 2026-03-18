@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud PDF Merger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Space Grotesk"', 'sans-serif'] },
+                    colors: { background: '#020617' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #020617;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-nav {
+            background: rgba(2, 6, 23, 0.7);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #3b82f6, #8b5cf6);
+        }
+
+        .btn-gradient {
+            background-image: linear-gradient(to right, #3b82f6, #8b5cf6);
+            transition: all 0.3s;
+        }
+
+        .btn-gradient:hover:not(:disabled) {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-gradient:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .drop-zone {
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.dragover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen relative flex flex-col">
+    <div class="glow bg-blue-600/20 w-[50vw] h-[50vw] top-[-20%] left-[-10%]"></div>
+    <div class="glow bg-purple-600/20 w-[40vw] h-[40vw] bottom-[-10%] right-[-10%]"></div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="showPage('landing')">
+                <span class="text-2xl font-bold">Cloud<span class="text-blue-500">PDF</span></span>
+            </div>
+            <button onclick="showPage('app')" class="btn-gradient px-6 py-2.5 rounded-full font-medium text-sm">View
+                Project</button>
+        </div>
+    </nav>
+
+    <!-- Landing Page (Page 1) -->
+    <main id="landingPage" class="flex-1">
+        <section class="max-w-4xl mx-auto text-center pt-24 pb-20 px-6">
+            <h1 class="text-6xl md:text-7xl font-bold mb-8">Cloud <span class="text-gradient">PDF Merger</span></h1>
+            <p class="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">Seamlessly merge your documents in the cloud.
+                Supercharged by AWS EC2 + S3 workflow.</p>
+            <button onclick="showPage('app')"
+                class="btn-gradient px-8 py-4 rounded-full font-semibold text-lg inline-flex items-center gap-2">
+                Get Started
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            </button>
+        </section>
+
+        <section class="max-w-6xl mx-auto px-6 mb-32">
+            <h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="glass p-8 rounded-2xl text-center hover:-translate-y-1 transition-transform">
+                    <div
+                        class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mx-auto mb-4 text-blue-400 font-bold">
+                        1</div>
+                    <h3 class="font-semibold mb-2">Upload Files</h3>
+                    <p class="text-sm text-slate-400">Select multiple PDF files securely from your device.</p>
+                </div>
+                <div class="glass p-8 rounded-2xl text-center hover:-translate-y-1 transition-transform">
+                    <div
+                        class="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto mb-4 text-purple-400 font-bold">
+                        2</div>
+                    <h3 class="font-semibold mb-2">Stored in S3</h3>
+                    <p class="text-sm text-slate-400">Temporary storage in highly available AWS S3 buckets.</p>
+                </div>
+                <div class="glass p-8 rounded-2xl text-center hover:-translate-y-1 transition-transform">
+                    <div
+                        class="w-12 h-12 rounded-full bg-pink-500/20 flex items-center justify-center mx-auto mb-4 text-pink-400 font-bold">
+                        3</div>
+                    <h3 class="font-semibold mb-2">Processed in EC2</h3>
+                    <p class="text-sm text-slate-400">Lightning fast merging via dedicated compute instances.</p>
+                </div>
+                <div class="glass p-8 rounded-2xl text-center hover:-translate-y-1 transition-transform">
+                    <div
+                        class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 text-green-400 font-bold">
+                        4</div>
+                    <h3 class="font-semibold mb-2">Download Output</h3>
+                    <p class="text-sm text-slate-400">Get your merged PDF instantly and securely.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-6xl mx-auto px-6 mb-32 grid grid-cols-1 md:grid-cols-2 gap-16">
+            <div class="glass p-10 rounded-3xl">
+                <h2 class="text-3xl font-bold mb-8">Tech Stack</h2>
+                <div class="flex flex-wrap gap-4">
+                    <span class="px-5 py-2.5 rounded-full text-sm bg-white/5 border border-white/10">AWS EC2</span>
+                    <span class="px-5 py-2.5 rounded-full text-sm bg-white/5 border border-white/10">AWS S3</span>
+                    <span class="px-5 py-2.5 rounded-full text-sm bg-white/5 border border-white/10">Node.js</span>
+                    <span class="px-5 py-2.5 rounded-full text-sm bg-white/5 border border-white/10">Express.js</span>
+                    <span class="px-5 py-2.5 rounded-full text-sm bg-white/5 border border-white/10">HTML/CSS/JS</span>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold mb-8">Features</h2>
+                <ul class="space-y-4">
+                    <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Upload multiple PDFs</li>
+                    <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Fast Cloud processing</li>
+                    <li class="flex items-center gap-3"><span class="text-green-400">✓</span> Instant download</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="max-w-4xl mx-auto px-6 mb-20">
+            <div class="glass p-12 rounded-3xl text-center bg-gradient-to-r from-blue-500/5 to-purple-500/5">
+                <h2 class="text-3xl font-bold mb-8">Ready to Experience the Cloud?</h2>
+                <button onclick="showPage('app')" class="btn-gradient px-8 py-4 rounded-full font-bold">View Project on
+                    GitHub</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- App Page (Page 2) -->
+    <main id="appPage" class="flex-1 hidden p-6 flex flex-col items-center justify-center min-h-[calc(100vh-80px)]">
+        <!-- Title Section -->
+        <div class="mb-10 flex flex-col items-center text-center">
+            <div
+                class="w-12 h-12 rounded-2xl bg-[#081533] border border-blue-800/60 flex items-center justify-center mb-6 text-blue-500 shadow-lg shadow-blue-900/20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold mb-3 tracking-wide text-white">Cloud <span
+                    class="text-blue-600">PDF Merger</span></h1>
+            <p class="text-slate-400 text-sm md:text-base">The futuristic way to combine your documents securely.</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-[#0b0e14] border border-white/5 shadow-2xl rounded-2xl p-8 w-full max-w-[640px]">
+
+            <!-- Drop Zone -->
+            <div id="dropZone"
+                class="mb-6 drop-zone border border-dashed border-white/10 rounded-xl p-12 flex flex-col items-center justify-center cursor-pointer hover:border-white/20 hover:bg-white/5 transition-all w-full min-h-[220px]">
+                <input type="file" id="fileInput" multiple accept="application/pdf" class="hidden">
+                <svg class="w-8 h-8 text-slate-400 mb-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v10" />
+                </svg>
+                <div class="text-center group">
+                    <p class="font-medium text-white mb-2 pb-1 text-[15px]">Drag & drop files or <span
+                            class="text-blue-600 group-hover:text-blue-500 transition-colors">browse</span></p>
+                    <p class="text-[10px] tracking-[0.1em] text-slate-500 font-semibold uppercase mt-1">ONLY PDF FILES
+                        SUPPORTED</p>
+                </div>
+                <div id="fileList" class="mt-4 flex flex-col gap-2 w-full text-center text-sm text-slate-300"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 w-full">
+                <!-- Upload Button -->
+                <button id="uploadBtn"
+                    class="flex-1 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-white rounded-xl py-3.5 font-semibold flex items-center justify-center gap-3 text-sm tracking-wide disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Upload Files
+                </button>
+
+                <!-- Merge Button -->
+                <button id="mergeBtn"
+                    class="flex-1 bg-[#1a3182] hover:bg-[#203da3] transition-all text-white rounded-xl py-3.5 font-semibold flex items-center justify-center gap-3 text-sm tracking-wide disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#1a3182]/50 disabled:text-white/50">
+                    <svg class="w-5 h-5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                    Merge PDFs
+                </button>
+            </div>
+
+            <!-- Progress and Success Areas -->
+            <div id="progressArea" class="mt-6 hidden text-left w-full">
+                <div class="flex justify-between text-xs mb-3 font-medium">
+                    <span id="statusTxt" class="text-blue-400 tracking-wide uppercase">Uploading...</span>
+                    <span id="progressTxt" class="text-slate-400">0%</span>
+                </div>
+                <div class="w-full bg-[#111624] rounded-full h-1 overflow-hidden">
+                    <div id="progressBar"
+                        class="bg-blue-600 h-full rounded-full w-0 transition-all duration-300 shadow-[0_0_10px_rgba(37,99,235,0.8)]">
+                    </div>
+                </div>
+            </div>
+
+            <div id="successArea" class="mt-8 hidden w-full text-center flex-col items-center">
+                <h3 class="text-base font-bold text-emerald-400 mb-4 tracking-wide uppercase">Ready to Download</h3>
+                <a id="downloadBtn" target="_blank"
+                    class="bg-[#1a3182] hover:bg-[#203da3] transition-colors inline-flex items-center gap-2 px-10 py-3 rounded-xl font-semibold text-white tracking-wide text-sm shadow-[0_4px_20px_rgba(26,49,130,0.4)]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download PDF
+                </a>
+            </div>
+
+            <div id="errorArea"
+                class="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs hidden w-full text-center font-medium tracking-wide">
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-14 text-center text-[10px] tracking-[0.2em] font-medium text-slate-500 uppercase">
+            MADE BY LOKEEK LOKHANDE
+        </div>
+    </main>
+
+    <script>
+        function showPage(page) {
+            document.getElementById('landingPage').classList.toggle('hidden', page !== 'landing');
+            document.getElementById('appPage').classList.toggle('hidden', page !== 'app');
+            window.scrollTo(0, 0);
+        }
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const mergeBtn = document.getElementById('mergeBtn');
+        const progressArea = document.getElementById('progressArea');
+        const progressBar = document.getElementById('progressBar');
+        const statusTxt = document.getElementById('statusTxt');
+        const progressTxt = document.getElementById('progressTxt');
+        const successArea = document.getElementById('successArea');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const errorArea = document.getElementById('errorArea');
+
+        let selectedFiles = [];
+        let uploadedNames = [];
+
+        dropZone.onclick = () => fileInput.click();
+        dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add('dragover'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+        dropZone.ondrop = e => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); };
+        fileInput.onchange = e => handleFiles(e.target.files);
+
+        // Initialize buttons as disabled initially
+        uploadBtn.disabled = true;
+        mergeBtn.disabled = true;
+
+        function handleFiles(files) {
+            const pdfs = Array.from(files).filter(f => f.type === 'application/pdf' || f.name.endsWith('.pdf'));
+            if (pdfs.length < 2) return showError('Please select at least 2 PDF files.');
+            selectedFiles = pdfs;
+            hideError();
+
+            fileList.innerHTML = '';
+            pdfs.forEach(f => {
+                fileList.innerHTML += `<div class="bg-white/5 border border-white/10 p-2.5 rounded-lg text-sm text-slate-300 truncate">${f.name}</div>`;
+            });
+
+            uploadBtn.disabled = false;
+            mergeBtn.disabled = true;
+            successArea.classList.add('hidden');
+            progressArea.classList.add('hidden');
+        }
+
+        function showError(msg) { errorArea.textContent = msg; errorArea.classList.remove('hidden'); }
+        function hideError() { errorArea.classList.add('hidden'); }
+
+        function simulateProgress(start, end, text, duration) {
+            return new Promise(resolve => {
+                progressArea.classList.remove('hidden');
+                statusTxt.textContent = text;
+                let cur = start;
+                const step = (end - start) / 20;
+                const timer = setInterval(() => {
+                    cur += step;
+                    if (cur >= end) { cur = end; clearInterval(timer); resolve(); }
+                    progressBar.style.width = cur + '%';
+                    progressTxt.textContent = Math.round(cur) + '%';
+                }, duration / 20);
+            });
+        }
+
+        uploadBtn.onclick = async () => {
+            hideError();
+            uploadBtn.disabled = true;
+            progressArea.classList.remove('hidden');
+            await simulateProgress(0, 30, 'Preparing upload...', 1000);
+
+            const fd = new FormData();
+            selectedFiles.forEach(f => fd.append('files', f)); // changed from 'pdf' to 'files'
+            statusTxt.textContent = 'Uploading...';
+
+            try {
+                const res = await fetch('http://44.220.145.79:3000/upload', { method: 'POST', body: fd });
+                if (!res.ok) throw new Error('Upload failed');
+                const data = await res.json();
+
+                uploadedNames = (data.files || data || selectedFiles).map(f => f.filename || f.name || f);
+
+                await simulateProgress(30, 100, 'Upload Complete', 500);
+                uploadBtn.disabled = true;
+                mergeBtn.disabled = false;
+            } catch (err) {
+                showError('Upload Error: ' + err.message);
+                uploadBtn.disabled = false;
+                progressArea.classList.add('hidden');
+            }
+        };
+
+        mergeBtn.onclick = async () => {
+            hideError();
+            mergeBtn.disabled = true;
+            await simulateProgress(0, 50, 'Processing...', 1000);
+            await simulateProgress(50, 80, 'Merging...', 1000);
+
+            try {
+                const res = await fetch('http://44.220.145.79:3000/merge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ files: uploadedNames.length ? uploadedNames : selectedFiles.map(f => f.name) })
+                });
+                if (!res.ok) throw new Error('Merge failed');
+                const data = await res.json();
+
+                await simulateProgress(80, 100, 'Done', 500);
+                progressArea.classList.add('hidden');
+                mergeBtn.disabled = false;
+
+                successArea.classList.remove('hidden');
+                downloadBtn.href = data.downloadUrl || data.url || '#';
+            } catch (err) {
+                showError('Merge Error: ' + err.message);
+                mergeBtn.disabled = false;
+                progressArea.classList.add('hidden');
+            }
+        };
+    </script>
+</body>
+
+</html>
