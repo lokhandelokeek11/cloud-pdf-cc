@@ -349,7 +349,7 @@
             statusTxt.textContent = 'Uploading...';
 
             try {
-                const res = await fetch('http://3.227.45.245:3000/upload', { method: 'POST', body: fd });
+                const res = await fetch('https://cloud-pdf-backend.onrender.com/upload', { method: 'POST', body: fd });
                 if (!res.ok) throw new Error('Upload failed');
                 const data = await res.json();
 
@@ -372,7 +372,7 @@
             await simulateProgress(50, 80, 'Merging...', 1000);
 
             try {
-                const res = await fetch('http://3.227.45.245:3000/merge', {
+                const res = await fetch('https://cloud-pdf-backend.onrender.com/merge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ files: uploadedNames.length ? uploadedNames : selectedFiles.map(f => f.name) })
